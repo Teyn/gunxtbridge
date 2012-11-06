@@ -82,7 +82,7 @@ using namespace guWhiteboard;
 
 GUNxtInterface ::GUNxtInterface()
 	{
-	   wb = new Whiteboard();
+	    wb = new Whiteboard();
 
 	   for (int i=IN_1; i < TOTAL_IN_PORTS; i++)
 		{ touchInitialized [i]=false;
@@ -255,35 +255,54 @@ void GUNxtInterface::callBackRotationSensorStart(std::string dataName, WBMsg *ms
 	int sensorIndicated= findMotorInContent(dataName, msg);
 
 	if (  (OUT_A<= sensorIndicated) && ( sensorIndicated<= OUT_C) )
-	{ if (!  rotationInitialized [sensorIndicated] )
-		{ rotationInitialized [sensorIndicated]=true;
-		DBG(cerr << " ** START " << sensorIndicated << endl;)
+	{ 
+		if (!  rotationInitialized [sensorIndicated] )
+		{ 
+			rotationInitialized [sensorIndicated]=true;
+			DBG(cerr << " ** START " << sensorIndicated << endl;)
 		}
-		  NXT::Motor::ResetRotationCount(sensorIndicated,false); //Reset the rotaiton count
-          reportingOnRotation [sensorIndicated]=true;
+	NXT::Motor::ResetRotationCount(sensorIndicated,false); //Reset the rotaiton count
+        reportingOnRotation [sensorIndicated]=true;
 	}
 }
 
 void GUNxtInterface::callBackTouchSensorStart(std::string dataName, WBMsg *msg)
 {
    // TODO: this is a different trhead, may need semaphore protection
+	DBG(cerr << " ** START TOUCH SENSOR **" << endl;)
 
-	// CODE TO ADD HERE FOR LABORATORY 2
+	int sensorIndicated = findSensorInContent(dataName, msg);
 
-}
+	if ((IN_1 <= sensorIndicated) && (sensorIndicated<= IN_4))
+	{
+		if (!touchInitialized[sensorIndicated])
+		{
+			touchInitialized[sensorIndicated]=true;
+			DBG(cerr << " ** START " << sensorIndicated << endl;)
+		}
+		NXT::Sensor::SetTouch(sensorIndicated); //Reset the rotaiton count
+        	reportingOnTouch[sensorIndicated]=true;
+	}
+}	
 
 void GUNxtInterface::callBackTouchSensorStop(std::string dataName, WBMsg *msg)
 {
    // TODO: this is a different trhead, may need semaphore protection
 
-	// CODE TO ADD HERE FOR LABORATORY 2
+	DBG(cerr << " ** STOP TOUCH SENSOR **" << endl;)
+
+	int sensorIndicated = findSensorInContent(dataName, msg);
+
+	if ((IN_1 <= sensorIndicated) && (sensorIndicated<= IN_4))
+	{
+		NXT::Sensor::SetTouch(sensorIndicated); //Reset the rotaiton count
+		reportingOnTouch[sensorIndicated]=false;
+	}
 }
 
 void GUNxtInterface::callBackSonarSensorStart(std::string dataName, WBMsg *msg)
 {
    // TODO: this is a different trhead, may need semaphore protection
-
-	// CODE TO ADD HERE FOR LABORATORY 2
 
 }
 
