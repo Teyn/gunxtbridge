@@ -94,7 +94,8 @@ GUNxtInterface ::GUNxtInterface()
 		}
 
 	   for (int i=OUT_A; i < TOTAL_OUT_PORTS; i++)
-		{ rotationInitialized [i]=false;
+		{ 
+		  rotationInitialized [i]=false;
 		  reportingOnRotation [i]=false;
 		}
 
@@ -130,7 +131,8 @@ void GUNxtInterface ::banner()
 bool GUNxtInterface :: connect()
 	{ 
     	if(NXT::Open()) //initialize the NXT and continue if it succeds
-		{ cerr << "Connection established" << endl;
+		{ 
+		  cerr << "Connection established" << endl;
 		  return true;
 		}
    	else
@@ -210,8 +212,9 @@ int GUNxtInterface::findMotorInContent(std::string dataName, WBMsg *msg)
 			motorIndicated=OUT_C;
 		}
 	else 
-		{ DBG (cout << "UNKNOWN MOTOR ID"  << content << endl );
-		  return VLAD_ID_ERROR;
+		{ 
+			DBG (cout << "UNKNOWN MOTOR ID"  << content << endl );
+			return VLAD_ID_ERROR;
 		}
 
 		return motorIndicated;
@@ -267,7 +270,6 @@ void GUNxtInterface::callBackRotationSensorStart(std::string dataName, WBMsg *ms
 void GUNxtInterface::callBackTouchSensorStart(std::string dataName, WBMsg *msg)
 {
    // TODO: this is a different trhead, may need semaphore protection
-
 	// CODE TO ADD HERE FOR LABORATORY 2
 
 }
@@ -284,7 +286,19 @@ void GUNxtInterface::callBackSonarSensorStart(std::string dataName, WBMsg *msg)
    // TODO: this is a different trhead, may need semaphore protection
 
 	// CODE TO ADD HERE FOR LABORATORY 2
+	DBG(cerr << " ** START SONAR SENSOR  **" << endl;)
+	int sensorIndicated= findSensorInContent(dataName, msg);
 
+	if((IN_1<=sensorIndicated) && (sensorIndicated<= IN_3))
+	{
+		if(!sonarInitialized[sensorIndicated])
+		{
+			DBG(cerr << "Starting sonar sensor..." << endl);
+			sonarInitialized[sensorIndicated] = true;
+			NXT::Sensor::SetSonar(sensorIndicated);
+		}
+	reportingOnSonar[sensorIndicated] = true;
+	}
 }
 
 void GUNxtInterface::callBackSonarSensorStop(std::string dataName, WBMsg *msg)
@@ -292,6 +306,19 @@ void GUNxtInterface::callBackSonarSensorStop(std::string dataName, WBMsg *msg)
    // TODO: this is a different trhead, may need semaphore protection
 
 	// CODE TO ADD HERE FOR LABORATORY 2
+	DBG(cerr << " ** STOP SONAR SENSOR  **" << endl;)
+	int sensorIndicated= findSensorInContent(dataName, msg);
+
+	if((IN_1<=sensorIndicated) && (sensorIndicated<= IN_3))
+	{
+		if(!sonarInitialized[sensorIndicated])
+		{
+			DBG(cerr << "Stopping sonar sensor..." << endl);
+			sonarInitialized[sensorIndicated] = false;
+			NXT::Sensor::SetSonarOff(sensorIndicated);
+		}
+	reportingOnSonar[sensorIndicated] = false;
+	}
 }
 
 
@@ -300,7 +327,19 @@ void GUNxtInterface::callBackLightSensorStart(std::string dataName, WBMsg *msg)
    // TODO: this is a different thread, may need semaphore protection
 
 	// CODE TO ADD HERE FOR LABORATORY 2
+	DBG(cerr << " ** START LIGHT SENSOR  **" << endl;)
+	int sensorIndicated= findSensorInContent(dataName, msg);
 
+	if((IN_1<=sensorIndicated) && (sensorIndicated<= IN_3))
+	{
+		if(!sonarInitialized[sensorIndicated])
+		{
+			DBG(cerr << "Starting light sensor..." << endl);
+			sonarInitialized[sensorIndicated] = true;
+			NXT::Sensor::SetLight(sensorIndicated, true);
+		}
+	reportingOnLight[sensorIndicated] = true;
+	}
 }
 
 void GUNxtInterface::callBackLightSensorStop(std::string dataName, WBMsg *msg)
@@ -308,11 +347,33 @@ void GUNxtInterface::callBackLightSensorStop(std::string dataName, WBMsg *msg)
    // TODO: this is a different thread, may need semaphore protection
 
 	// CODE TO ADD HERE FOR LABORATORY 2
+	DBG(cerr << " ** STOP LIGHT SENSOR  **" << endl;)
+	int sensorIndicated= findSensorInContent(dataName, msg);
+
+	if((IN_1<=sensorIndicated) && (sensorIndicated<= IN_3))
+	{
+		if(!sonarInitialized[sensorIndicated])
+		{
+			DBG(cerr << "Stopping light sensor..." << endl);
+			sonarInitialized[sensorIndicated] = false;
+			NXT::Sensor::SetLight(sensorIndicated, false);
+		}
+	reportingOnLight[sensorIndicated] = false;
+	}
 }
 
 void GUNxtInterface::callBackMotorStop(std::string dataName, WBMsg *msg)
 {
 	// CODE TO ADD HERE FOR LABORATORY 2
+	DBG(cerr << " ** STOP MOTORS  **" << endl;)
+	int motorIndicated= findMotorInContent(dataName, msg);
+
+	if((OUT_A<=motorIndicated) && (motorIndicated<= OUT_C))
+	{
+		DBG(cerr << "Stopping motor..." << endl);
+		NXT::Motor::Stop(motorIndicated, true);	
+	}
+
 }
 
 void GUNxtInterface::callBackMotorBackward(std::string dataName, WBMsg *msg)
@@ -329,7 +390,7 @@ void GUNxtInterface::callBackMotorForward(std::string dataName, WBMsg *msg)
 void GUNxtInterface::callBackStop(std::string dataName, WBMsg *msg)
 {
 	DBG(cerr << " ** STOP  **" << endl;)
-		NXT::StopSound();
+	NXT::StopSound();
 }
 
 void GUNxtInterface::callBackPlay(std::string dataName, WBMsg *msg)
@@ -382,11 +443,3 @@ void GUNxtInterface::reportActiveSonarSensors()
 
 	// CODE TO ADD HERE FOR LABORATORY 2
 }
-
-
-
-
-
-
-
-
